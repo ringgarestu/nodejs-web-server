@@ -1,24 +1,34 @@
 const http = require('http');
 
 const requestListener = (request, response) => {
-    response.setHeader('Content-Type', 'text/html');
-    response.statusCode = 200;
+    response.setHeader('Content-Type', 'application/json');
+    response.setHeader('X-Powered-By', 'NodeJS')
+
 
     const { method, url } = request;
 
     if (url === '/') {
         if (method === 'GET') {
             // bila client menggunakan GET
-            response.end(`<h1>Ini adalah hompage`);
+            response.statusCode = 200;
+            response.end(JSON.stringify({
+                message: 'Ini adalah hompage',
+            }))
         } else {
             // bila client tidak menggunakan GET
-            response.end(`<h1>Halaman tidak dapat diakses dengan ${method} request</h1>`)
+            response.statusCode = 400;
+            response.end(JSON.stringify({
+                message: `Halaman tidak dapat diakses dengan ${method} request`,
+            }))
         }
     } else if (url === '/about') {
         //todo3
         if (method === 'GET') {
             // respons bila client menggunakan GET
-            response.end('<h1> Halo! Halaman ini adalah halaman about</h1>')
+            response.statusCode = 200;
+            response.end(JSON.stringify({
+                message: 'Halo! Halaman ini adalah halaman about',
+            }))
         } else if (method === 'POST') {
             // respon bila clien menggunakan POST
             let body = [];
@@ -30,14 +40,23 @@ const requestListener = (request, response) => {
             request.on('end', () => {
                 body = Buffer.concat(body).toString();
                 const { name } = JSON.parse(body);
-                response.end(`<h1> Halo ${name}! ini adalah halaman about</h1>`);
+                response.statusCode = 200;
+                response.end(JSON.stringify({
+                    message: ` Halo ${name}! ini adalah halaman about`,
+                }))
             });
         } else {
             // respon bila client tidak menggunakan GET atau POST
-            response.end(`<h1>Halaman tidak dapat diakses menggunakan ${method} request</h1>`)
+            response.statusCode = 400;
+            response.end(JSON.stringify({
+                message: `Halaman tidak dapat diakses menggunakan ${method} request`,
+            }))
         }
     } else {
-        response.end(`<h1>Halaman tidak ditemukan!</h1>`)
+        response.statusCode = 404;
+        response.end(JSON.stringify({
+            message: 'Halaman tidak ditemukan!',
+        }))
     }
 
 
